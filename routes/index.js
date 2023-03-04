@@ -12,20 +12,6 @@ router.get("/:userId", passport.authenticate("jwt", { session: false }), (req, r
 
 router.post("/login", userController.login)
 
-// router.get("/:userId", (req, res, next) => {
-//   res.send("Get request for user information. ")
-// })
-
-// router.get("/:userId", (req, res, next) => {
-//   res.send("Get request for user information. ")
-// })
-
-// router.get("/:userId", (req, res, next) => {
-//   res.send("Get request for user information. ")
-// })
-
-// router.get("/:userId", (req, res, next) => {
-//   res.send("Get request for user information. ")
-// })
+router.post("/signup", userController.signup)
 
 module.exports = router;

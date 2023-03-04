@@ -28,6 +28,7 @@ passport.use(
           return cb(null, false, { message: "Incorrect Password. " })
         }
       } catch(err) {
+        console.log(err)
         return cb(err)
       }
     }

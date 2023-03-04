@@ -1,7 +1,20 @@
 const { body, validationResult } = require("express-validator")
 const passport = require("passport")
 const jwt = require("jsonwebtoken")
+const bcrypt = require("bcryptjs")
 const User = require("../models/user")
+
+function generatePlainUserObject(user) {
+  const userOb = {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    password: user.password,
+    isBlogOwner: user.isBlogOwner,
+  }
+
+  return userOb
+}
 
 exports.signup = [
   body("firstName", "First Name must be specified. ")
@@ -53,16 +66,18 @@ exports.signup = [
         password: hashedPassword
       })
       await user.save()
-      req.login(user, { session: false }, (err) => {
-        if (err) {
-          res.status(503).json({ error: "Something Bad Happened. " });
-        }
+
+      const plainUserObject = generatePlainUserObject(user)
   
-        const token = jwt.sign(user, proceess.env.JWT_SECRET);
-        return res.json({ user, token });
-      });
+      const token = jwt.sign(plainUserObject, process.env.JWT_SECRET);
+      return res.json({ user: plainUserObject, token });
+      // req.login(user, { session: false }, (err) => {
+      //   if (err) {
+      //     return next(err)
+      //   }
+      // });
     } catch(err) {
-      return res.status(503).json({ error: "Something Bad Happened. " })
+      return next(err)
     }
   }
 ]
@@ -82,7 +97,6 @@ exports.login = [
   .escape(),
 
   (req, res, next) => {
-    console.log(req.body)
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() })
@@ -99,11 +113,12 @@ exports.login = [
   
       req.login(user, { session: false }, (err) => {
         if (err) {
-          res.send(err);
+          return next(err);
         }
+        const plainUserObject = generatePlainUserObject(user)
   
-        const token = jwt.sign(user, proceess.env.JWT_SECRET);
-        return res.json({ user, token });
+        const token = jwt.sign(plainUserObject, process.env.JWT_SECRET);
+        return res.json({ user: plainUserObject, token });
       });
     })(req, res, next);
   }
