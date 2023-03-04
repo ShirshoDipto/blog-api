@@ -41,19 +41,36 @@ async function main() {
   // const comment = await Comment.findOne({}).populate("replies")
   // console.log(comment.replies[0].date_formatted)
 
-  const newCommentLike = new CommentLike({
-    author: "640189b3c2dc3b9e1a4b2446",
+  // const newCommentLike = new CommentLike({
+  //   author: "640189b3c2dc3b9e1a4b2446",
+  // })
+
+  // const savedLikeComment = await newCommentLike.save()
+  // console.log("comment like", savedLikeComment)
+
+  // const newPostLike = new PostLike({
+  //   author: "640189b3c2dc3b9e1a4b2446",
+  // })
+
+  // const savedLikePost = await newPostLike.save()
+  // console.log("post like", savedLikePost)
+
+  const newPost = new Post({
+    title: "New title 2",
+    content: "Hahahahahahahahahahahaha",
+    author: {
+      authorId: "640189b3c2dc3b9e1a4b2446",
+      firstName: "Ahmad",
+      lastName: "Nibras"
+    },
+    numLikes: "200",
+    numComments: "100",
+    isPublished: false
   })
 
-  const savedLikeComment = await newCommentLike.save()
-  console.log("comment like", savedLikeComment)
+  const savedPost = await newPost.save()
 
-  const newPostLike = new PostLike({
-    author: "640189b3c2dc3b9e1a4b2446",
-  })
-
-  const savedLikePost = await newPostLike.save()
-  console.log("post like", savedLikePost)
+  console.log(savedPost)
 }
 
 main().catch(err => console.log(err))

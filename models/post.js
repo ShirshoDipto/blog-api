@@ -13,7 +13,8 @@ const PostSchema = new Schema({
     lastName: {type: String, required: true}
   },
   numLikes: {type: String, required: true},
-  numComments: {type: String, required: true}
+  numComments: {type: String, required: true},
+  isPublished: {type: Boolean, required: true}
 })
 
 PostSchema.virtual("date_formatted").get(function () {
