@@ -7,6 +7,54 @@ const PostLike = require("./models/postLike")
 const mongoose = require("mongoose")
 require("dotenv").config()
 
+async function createPostWithLotOfCommentsAndReplies() {
+  const post = new Post({
+    title: "Test Post for delete operation. ",
+    content: "Test content for delete opration. ",
+    author: {
+      authorId: "640189b3c2dc3b9e1a4b2446",
+      firstName: "Shirsho",
+      lastName: "Dipto"
+    },
+    isPublished: false
+  })
+  const savedPost = await post.save()
+
+  let comments = []
+  let replies = []
+
+  for (let i = 1; i < 501; i++) {
+    const comment = new Comment({
+      content: `Test Comment ${i}`,
+      author: {
+        authorId: `640189b3c2dc3b9e1a4b2446`,
+        firstName: "Random",
+        lastName: "Guy"
+      },
+      postId: `${savedPost._id}`,
+      replies: []
+    })
+    for (let x = 1; x < 101; x++) {
+      const reply = new Reply({
+        author: {
+          authorId: "640189b3c2dc3b9e1a4b2446",
+          firstName: "Random",
+          lastName: "Guy"
+        },
+        content: `Test reply ${i} ${x}`,
+        commentId: `${comment._id}`
+      })
+      replies.push(reply)
+      console.log(`...Reply ${x} pushed. `)
+    }
+    comments.push(comment)
+    console.log((`...Comment ${i} pushed. `))
+  }
+  await Comment.insertMany(comments)
+  await Reply.insertMany(replies)
+  console.log("Finished. ")
+}
+
 mongoose.set("strictQuery", false)
 const mongodb = process.env.MONGODB_URI
 async function main() {
@@ -55,22 +103,23 @@ async function main() {
   // const savedLikePost = await newPostLike.save()
   // console.log("post like", savedLikePost)
 
-  const newPost = new Post({
-    title: "New title 2",
-    content: "Hahahahahahahahahahahaha",
-    author: {
-      authorId: "640189b3c2dc3b9e1a4b2446",
-      firstName: "Ahmad",
-      lastName: "Nibras"
-    },
-    numLikes: "200",
-    numComments: "100",
-    isPublished: false
-  })
+  // const newPost = new Post({
+  //   title: "New title 2",
+  //   content: "Hahahahahahahahahahahaha",
+  //   author: {
+  //     authorId: "640189b3c2dc3b9e1a4b2446",
+  //     firstName: "Ahmad",
+  //     lastName: "Nibras"
+  //   },
+  //   numLikes: "200",
+  //   numComments: "100",
+  //   isPublished: false
+  // })
 
-  const savedPost = await newPost.save()
+  // const savedPost = await newPost.save()
 
-  console.log(savedPost)
+  // console.log(savedPost)
+  createPostWithLotOfCommentsAndReplies()
 }
 
 main().catch(err => console.log(err))

@@ -43,8 +43,10 @@ passport.use(
     },
     async function (jwtPayload, cb) {
       try {
-        return cb(null, jwtPayload.user)
+        return cb(null, { message: "Authentication successful. " })
+        next()
       } catch(err) {
+        console.log(err)
         return cb(err)
       }
     }

@@ -6,6 +6,7 @@ const User = require("../models/user")
 
 function generatePlainUserObject(user) {
   const userOb = {
+    _id: user._id,
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
@@ -69,13 +70,8 @@ exports.signup = [
 
       const plainUserObject = generatePlainUserObject(user)
   
-      const token = jwt.sign(plainUserObject, process.env.JWT_SECRET);
-      return res.json({ user: plainUserObject, token });
-      // req.login(user, { session: false }, (err) => {
-      //   if (err) {
-      //     return next(err)
-      //   }
-      // });
+      const token = jwt.sign({user: plainUserObject}, process.env.JWT_SECRET);
+      return res.json({ user, token });
     } catch(err) {
       return next(err)
     }
@@ -117,8 +113,10 @@ exports.login = [
         }
         const plainUserObject = generatePlainUserObject(user)
   
-        const token = jwt.sign(plainUserObject, process.env.JWT_SECRET);
-        return res.json({ user: plainUserObject, token });
+        const token = jwt.sign({user: plainUserObject}, process.env.JWT_SECRET);
+        res.currentUser = plainUserObject
+        console.log(res.currentUser)
+        return res.json({ user, token });
       });
     })(req, res, next);
   }

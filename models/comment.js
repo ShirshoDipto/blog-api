@@ -8,12 +8,11 @@ const CommentSchema = new Schema({
   author: {
     authorId: {type: Schema.Types.ObjectId, ref:"User", requied: true},
     firstName: {type: String, required: true}, 
-    lastName: {type: String, required: true}
+    lastName: {type: String, default: "0"}
   },
   date: {type: Date, default: Date.now},
-  replies: [{type: Schema.Types.ObjectId, ref: "Reply"}],
   postId: {type: Schema.Types.ObjectId, requied: true, ref: "Post"},
-  numLikes: {type: String, required: true}
+  numLikes: { type: String, default: "0" }
 })
 
 CommentSchema.virtual("date_formatted").get(function () {

@@ -4,8 +4,61 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require("cors")
+// require("dotenv").config()
+// require("./passport")
+const passport = require("passport")
+const passportJWT = require("passport-jwt");
+const JWTStrategy = passportJWT.Strategy;
+const ExtractJWT = passportJWT.ExtractJwt;
+const LocalStrategy = require("passport-local").Strategy;
+const bcrypt = require("bcryptjs")
+const User = require("./models/user")
 require("dotenv").config()
-require("./passport")
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "email",
+      passwordField: "password",
+    },
+    async function (email, password, cb) {
+      try {
+        const user = await User.findOne({email: email})
+        if (!user) {
+          return cb(null, false, { message: "Email does not exist. " })
+        }
+
+        const res = await bcrypt.compare(password, user.password)
+
+        if (res) {
+          return cb(null, user)
+        } else {
+          return cb(null, false, { message: "Incorrect Password. " })
+        }
+      } catch(err) {
+        console.log(err)
+        return cb(err)
+      }
+    }
+  )
+);
+
+passport.use(
+  new JWTStrategy(
+    {
+      jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+      secretOrKey: process.env.JWT_SECRET,
+    },
+    async function (jwtPayload, cb) {
+      try {
+        return cb(null, jwtPayload.user)
+      } catch(err) {
+        console.log(err)
+        return cb(err)
+      }
+    }
+  )
+);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
