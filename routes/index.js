@@ -23,15 +23,15 @@ router.put("/posts/:postId", passport.authenticate("jwt", { session: false }), p
 router.delete("/posts/:postId", passport.authenticate("jwt", { session: false }), postController.deletePost)
 
 // /** Comment related routes. */
-// router.get("/posts/:postId/comments", commentController.getAllComments)
+router.get("/posts/:postId/comments", commentController.getAllComments)
 
-// router.post("/posts/:postId/comments", passport.authenticate("jwt", { session: false }), commentController.createComment)
+router.post("/posts/:postId/comments", passport.authenticate("jwt", { session: false }), commentController.createComment)
 
-// router.get("/posts/:postId/comments/:commentId", commentController.getSingleComment)
+router.get("/posts/:postId/comments/:commentId", commentController.getSingleComment)
 
-// router.put("/posts/:postId/comments/:commentId", passport.authenticate("jwt", { session: false }), commentController.updateComment)
+router.put("/posts/:postId/comments/:commentId", passport.authenticate("jwt", { session: false }), commentController.updateComment)
 
-// router.delete("/posts/:postId/comments/:commentId", passport.authenticate("jwt", { session: false }), commentController.deleteComment)
+router.delete("/posts/:postId/comments/:commentId", passport.authenticate("jwt", { session: false }), commentController.deleteComment)
 
 // /** Reply related routes. */
 // router.get("/posts/:postId/comments/:commentId/replies", replyController.getAllReplies)

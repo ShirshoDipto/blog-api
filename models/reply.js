@@ -12,7 +12,7 @@ const ReplySchema = new Schema({
   content: {type: String, required: true},
   commentId: { type: Schema.Types.ObjectId, required: true },
   date: {type: Date, default: Date.now},
-  numLikes: { type: String, default: "0" }
+  numLikes: { type: String, default: "0" },
 })
 
 ReplySchema.virtual("date_formatted").get(function () {

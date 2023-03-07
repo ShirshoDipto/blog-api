@@ -4,8 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require("cors")
-// require("dotenv").config()
-// require("./passport")
 const passport = require("passport")
 const passportJWT = require("passport-jwt");
 const JWTStrategy = passportJWT.Strategy;

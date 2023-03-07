@@ -18,12 +18,11 @@ async function createPostWithLotOfCommentsAndReplies() {
     },
     isPublished: false
   })
-  const savedPost = await post.save()
 
-  let comments = []
-  let replies = []
+  allComments = []
+  allReplies = []
 
-  for (let i = 1; i < 501; i++) {
+  for (let i = 1; i < 101; i++) {
     const comment = new Comment({
       content: `Test Comment ${i}`,
       author: {
@@ -31,10 +30,11 @@ async function createPostWithLotOfCommentsAndReplies() {
         firstName: "Random",
         lastName: "Guy"
       },
-      postId: `${savedPost._id}`,
-      replies: []
+      postId: `${post._id}`,
     })
-    for (let x = 1; x < 101; x++) {
+    allComments.push(comment)
+    console.log((`...Comment ${i} pushed. `))
+    for (let x = 1; x < 11; x++) {
       const reply = new Reply({
         author: {
           authorId: "640189b3c2dc3b9e1a4b2446",
@@ -44,15 +44,21 @@ async function createPostWithLotOfCommentsAndReplies() {
         content: `Test reply ${i} ${x}`,
         commentId: `${comment._id}`
       })
-      replies.push(reply)
+      allReplies.push(reply)
       console.log(`...Reply ${x} pushed. `)
     }
-    comments.push(comment)
-    console.log((`...Comment ${i} pushed. `))
   }
-  await Comment.insertMany(comments)
-  await Reply.insertMany(replies)
-  console.log("Finished. ")
+  await Promise.all([
+    Comment.insertMany(allComments),
+    Reply.insertMany(allReplies),
+    post.save()
+  ]).then(results => {
+    console.log("Finished. ")
+    console.log(post._id)
+  })
+  // await Comment.insertMany(allComments)
+  // await Reply.insertMany(allReplies)
+  // await post.save()
 }
 
 mongoose.set("strictQuery", false)

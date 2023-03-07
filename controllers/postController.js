@@ -2,12 +2,12 @@ const Post = require("../models/post")
 const Comment = require("../models/comment")
 const Reply = require("../models/reply")
 const { body, validationResult } = require("express-validator")
+const { deleteMany } = require("../models/post")
 
 exports.getAllPosts = async (req, res, next) => {
   try {
     const allPosts = await Post.find({}).sort({ date: -1 })
-    console.log(res.currentUser)
-    res.json({ user: res.currentUser, allPosts })
+    res.json({ user: res.currentUser, allPosts, success: "All posts fetched successfully." })
   } catch(err) {
     return next(err)
   }
@@ -29,7 +29,6 @@ exports.createPost = [
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() })
-        
       }
       if (!req.user.isBlogOwner) {
         return res.status(403).json({ error: "This user is not allowed to create post. " })
@@ -44,8 +43,6 @@ exports.createPost = [
           lastName: req.user.lastName,
         },
         isPublished: req.body.isPublished,
-        numLikes: req.body.numLikes,
-        numComments: req.body.numComments
       })
   
       const savedPost = await post.save()
@@ -104,15 +101,36 @@ exports.updatePost = [
   }
 ]
 
-exports.deletePost = async (req, res, next) => {
+async function deleteAllReplies(comments) {
   try {
-    const allComments = await Comment.find({ postId: req.params.postId })
-    for (let comment of allComments) {
+    for (let comment of comments) {
       await Reply.deleteMany({ commentId: comment._id })
     }
-    await Comment.deleteMany({ postId: req.params.postId })
-    await Post.findByIdAndRemove(req.params.postId)
-    return res.json({ success: "Post deleted successfully. "})
+  } catch(err) {
+    throw new Error(err)
+  }
+}
+
+async function deleteAllComments(id) {
+  try {
+    const allComments = await Comment.find({ postId: id })
+    await Promise.all([
+      Comment.deleteMany({ postId: id }),
+      deleteAllReplies(allComments)
+    ])
+  } catch(err) {
+    throw new Error(err)
+  }
+}
+
+exports.deletePost = async (req, res, next) => {
+  try {
+    await Promise.all([
+      Post.findByIdAndRemove(req.params.postId),
+      deleteAllComments(req.params.postId)
+    ]).then(results => {
+      return res.json({ success: "Post deleted successfully. "})
+    })
   } catch(err) {
     return next(err)
   }

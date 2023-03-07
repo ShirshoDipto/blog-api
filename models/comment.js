@@ -12,7 +12,8 @@ const CommentSchema = new Schema({
   },
   date: {type: Date, default: Date.now},
   postId: {type: Schema.Types.ObjectId, requied: true, ref: "Post"},
-  numLikes: { type: String, default: "0" }
+  numReplies: { type: String, default: "0" },
+  numLikes: { type: String, default: "0" },
 })
 
 CommentSchema.virtual("date_formatted").get(function () {
