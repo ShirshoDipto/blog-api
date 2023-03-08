@@ -8,57 +8,59 @@ const mongoose = require("mongoose")
 require("dotenv").config()
 
 async function createPostWithLotOfCommentsAndReplies() {
-  const post = new Post({
-    title: "Test Post for delete operation. ",
-    content: "Test content for delete opration. ",
-    author: {
-      authorId: "640189b3c2dc3b9e1a4b2446",
-      firstName: "Shirsho",
-      lastName: "Dipto"
-    },
-    isPublished: false
-  })
-
-  allComments = []
-  allReplies = []
-
-  for (let i = 1; i < 101; i++) {
-    const comment = new Comment({
-      content: `Test Comment ${i}`,
+  try {
+    const post = new Post({
+      title: "Test Post for delete operation. ",
+      content: "Test content for delete opration. ",
       author: {
-        authorId: `640189b3c2dc3b9e1a4b2446`,
-        firstName: "Random",
-        lastName: "Guy"
+        authorId: "6403019202a8f139409779e7",
+        firstName: "Shirsho",
+        lastName: "Dipto"
       },
-      postId: `${post._id}`,
+      isPublished: false
     })
-    allComments.push(comment)
-    console.log((`...Comment ${i} pushed. `))
-    for (let x = 1; x < 11; x++) {
-      const reply = new Reply({
+  
+    allComments = []
+    allReplies = []
+  
+    for (let i = 1; i < 21; i++) {
+      const comment = new Comment({
+        content: `Test Comment ${i}`,
         author: {
-          authorId: "640189b3c2dc3b9e1a4b2446",
+          authorId: `6403019202a8f139409779e7`,
           firstName: "Random",
           lastName: "Guy"
         },
-        content: `Test reply ${i} ${x}`,
-        commentId: `${comment._id}`
+        postId: `${post._id}`,
       })
-      allReplies.push(reply)
-      console.log(`...Reply ${x} pushed. `)
+      allComments.push(comment)
+      post.numComments = `${parseInt(post.numComments) + 1}`
+      console.log((`...Comment ${i} pushed. `))
+      for (let x = 1; x < 6; x++) {
+        const reply = new Reply({
+          author: {
+            authorId: "6403019202a8f139409779e7",
+            firstName: "Random",
+            lastName: "Guy"
+          },
+          content: `Test reply ${i} ${x}`,
+          commentId: `${comment._id}`
+        })
+        allReplies.push(reply)
+        comment.numReplies = `${parseInt(comment.numReplies) + 1}`
+        console.log(`...Reply ${x} pushed. `)
+      }
     }
-  }
-  await Promise.all([
-    Comment.insertMany(allComments),
-    Reply.insertMany(allReplies),
-    post.save()
-  ]).then(results => {
+    await Promise.all([
+      Comment.insertMany(allComments),
+      Reply.insertMany(allReplies),
+      post.save()
+    ])
     console.log("Finished. ")
     console.log(post._id)
-  })
-  // await Comment.insertMany(allComments)
-  // await Reply.insertMany(allReplies)
-  // await post.save()
+  } catch(err) {
+    console.log(err)
+  }
 }
 
 mongoose.set("strictQuery", false)

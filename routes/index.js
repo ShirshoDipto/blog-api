@@ -22,7 +22,7 @@ router.put("/posts/:postId", passport.authenticate("jwt", { session: false }), p
 
 router.delete("/posts/:postId", passport.authenticate("jwt", { session: false }), postController.deletePost)
 
-// /** Comment related routes. */
+/** Comment related routes. */
 router.get("/posts/:postId/comments", commentController.getAllComments)
 
 router.post("/posts/:postId/comments", passport.authenticate("jwt", { session: false }), commentController.createComment)
@@ -33,16 +33,16 @@ router.put("/posts/:postId/comments/:commentId", passport.authenticate("jwt", { 
 
 router.delete("/posts/:postId/comments/:commentId", passport.authenticate("jwt", { session: false }), commentController.deleteComment)
 
-// /** Reply related routes. */
-// router.get("/posts/:postId/comments/:commentId/replies", replyController.getAllReplies)
+/** Reply related routes. */
+router.get("/posts/:postId/comments/:commentId/replies", replyController.getAllReplies)
 
-// router.post("/posts/:postId/comments/:commentId/replies", passport.authenticate("jwt", { session: false }), replyController.createReply)
+router.post("/posts/:postId/comments/:commentId/replies", passport.authenticate("jwt", { session: false }), replyController.createReply)
 
-// router.get("/posts/:postId/comments/:commentId/replies/:reply", replyController.getSingleReply)
+router.get("/posts/:postId/comments/:commentId/replies/:replyId", replyController.getSingleReply)
 
-// router.put("/posts/:postId/comments/:commentId/replies/:reply", passport.authenticate("jwt", { session: false }), replyController.updateReply)
+router.put("/posts/:postId/comments/:commentId/replies/:replyId", passport.authenticate("jwt", { session: false }), replyController.updateReply)
 
-// router.delete("/posts/:postId/comments/:commentId/replies/:reply", passport.authenticate("jwt", { session: false }), replyController.deleteReply)
+router.delete("/posts/:postId/comments/:commentId/replies/:replyId", passport.authenticate("jwt", { session: false }), replyController.deleteReply)
 
 // /** Likes related routes. */
 

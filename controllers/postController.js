@@ -2,7 +2,6 @@ const Post = require("../models/post")
 const Comment = require("../models/comment")
 const Reply = require("../models/reply")
 const { body, validationResult } = require("express-validator")
-const { deleteMany } = require("../models/post")
 
 exports.getAllPosts = async (req, res, next) => {
   try {
@@ -102,25 +101,17 @@ exports.updatePost = [
 ]
 
 async function deleteAllReplies(comments) {
-  try {
-    for (let comment of comments) {
-      await Reply.deleteMany({ commentId: comment._id })
-    }
-  } catch(err) {
-    throw new Error(err)
+  for (let comment of comments) {
+    await Reply.deleteMany({ commentId: comment._id })
   }
 }
 
 async function deleteAllComments(id) {
-  try {
-    const allComments = await Comment.find({ postId: id })
-    await Promise.all([
-      Comment.deleteMany({ postId: id }),
-      deleteAllReplies(allComments)
-    ])
-  } catch(err) {
-    throw new Error(err)
-  }
+  const allComments = await Comment.find({ postId: id })
+  await Promise.all([
+    Comment.deleteMany({ postId: id }),
+    deleteAllReplies(allComments)
+  ])
 }
 
 exports.deletePost = async (req, res, next) => {
@@ -128,9 +119,8 @@ exports.deletePost = async (req, res, next) => {
     await Promise.all([
       Post.findByIdAndRemove(req.params.postId),
       deleteAllComments(req.params.postId)
-    ]).then(results => {
-      return res.json({ success: "Post deleted successfully. "})
-    })
+    ])
+    return res.json({ success: "Post deleted successfully. "})
   } catch(err) {
     return next(err)
   }

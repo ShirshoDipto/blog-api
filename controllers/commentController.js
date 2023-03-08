@@ -15,6 +15,16 @@ exports.getAllComments = async (req, res, next) => {
   }
 }
 
+async function updatePost(postId, type) {
+  const post = await Post.findById(postId)
+  if (type === "create") {
+    post.numComments = `${parseInt(post.numComments) + 1}`
+  } else {
+    post.numComments = `${parseInt(post.numComments) - 1}`
+  }
+  return await post.save() 
+}
+
 exports.createComment = [
   body("content", "Content cannot be empty. ")
   .trim()
@@ -37,8 +47,12 @@ exports.createComment = [
       postId: req.params.postId
     })
 
-    const savedComment = await comment.save()
-    res.json({ comment: savedComment, success: "Comment created successfully. " })
+    const results = await Promise.all([
+      comment.save(),
+      updatePost(comment.postId, "create")
+    ])
+
+    res.json({ comment: results[0], success: "Comment created successfully. " })
     } catch(err) {
       return next(err)
     }
@@ -90,14 +104,18 @@ exports.updateComment = [
 exports.deleteComment = async (req, res, next) => {
   try {
     const comment = await Comment.findById(req.params.commentId)
-    if (comment.author.authorId.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: "You can delete only your own comments. " })
-    }
     if (!comment) {
       return res.status(404).json({ error: "Comment not found. " })
     }
-    const deletedComment = await Comment.findByIdAndRemove(comment._id)
-    return res.json({ deletedComment, success: "Comment deleted successfully. " })
+    if (comment.author.authorId.toString() !== req.user._id.toString() && !req.user.isBlogOwner) {
+      return res.status(403).json({ error: "You can delete only your own comments. " })
+    }
+    const results = await Promise.all([
+      Comment.findByIdAndRemove(comment._id),
+      Reply.deleteMany({ commentId: comment._id }),
+      updatePost(comment.postId, "update")
+    ])
+    return res.json({ deletedComment: results[0], success: "Comment deleted successfully. " })
   } catch(err) {
     return next(err)
   }

@@ -10,7 +10,7 @@ const ReplySchema = new Schema({
     lastName: {type: String, required: true}
   },
   content: {type: String, required: true},
-  commentId: { type: Schema.Types.ObjectId, required: true },
+  commentId: { type: Schema.Types.ObjectId, ref: "Comment", required: true },
   date: {type: Date, default: Date.now},
   numLikes: { type: String, default: "0" },
 })
