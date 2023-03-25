@@ -19,9 +19,9 @@ exports.getAllReplies = async (req, res, next) => {
 async function updateComment(commentId, type) {
   const comment = await Comment.findById(commentId)
   if (type === "create") {
-    comment.numReplies = `${parseInt(comment.numReplies) + 1}`
+    comment.numReplies += 1
   } else {
-    comment.numReplies = `${parseInt(comment.numReplies) - 1}`
+    comment.numReplies -= 1
   }
   return await comment.save()
 }

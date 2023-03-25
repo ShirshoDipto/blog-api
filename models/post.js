@@ -12,8 +12,8 @@ const PostSchema = new Schema({
     firstName: {type: String, required: true},
     lastName: {type: String, required: true}
   },
-  numComments: { type: String, default: "0" },
-  numLikes: { type: String, default: "0" },
+  numComments: { type: Number, default: 0 },
+  numLikes: { type: Number, default: 0 },
   isPublished: {type: Boolean, required: true}
 })
 
