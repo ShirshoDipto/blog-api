@@ -66,9 +66,17 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 
 var app = express();
-app.use(cors()); // going to change this later on.
+app.use(
+  cors({
+    origin: "https://blog-app-shirsho-dipto.netlify.app",
+  })
+); // going to change this later on.
 app.use(compression());
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
