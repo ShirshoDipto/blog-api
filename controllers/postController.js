@@ -1,11 +1,18 @@
 const Post = require("../models/post");
 const Comment = require("../models/comment");
 const Reply = require("../models/reply");
+const Like = require("../models/like");
 const { body, validationResult } = require("express-validator");
+const dompurify = require("dompurify");
+const { JSDOM } = require("jsdom");
+const htmlPurify = dompurify(new JSDOM().window);
+const fs = require("fs/promises");
+const path = require("path");
 
 exports.getAllPosts = async (req, res, next) => {
   try {
-    const allPosts = await Post.find({}).sort({ date: -1 });
+    // newest to oldest
+    const allPosts = await Post.find({}).sort({ $natural: -1 });
     res.json({
       user: res.currentUser,
       allPosts,
@@ -17,15 +24,11 @@ exports.getAllPosts = async (req, res, next) => {
 };
 
 exports.createPost = [
-  body("title", "Title must be specified. ")
-    .trim()
-    .isLength({ min: 1 })
-    .escape(),
+  body("title", "Title must be specified. ").trim().isLength({ min: 1 }),
 
   body("content", "Content field cannot be empty. ")
     .trim()
-    .isLength({ min: 1 })
-    .escape(),
+    .isLength({ min: 1 }),
 
   async (req, res, next) => {
     try {
@@ -39,15 +42,21 @@ exports.createPost = [
           .json({ error: "This user is not allowed to create post. " });
       }
 
+      const sanitizedContent = htmlPurify.sanitize(req.body.content);
+      let imageName;
+      if (req.file) {
+        imageName = req.body.imageName;
+      }
+
       const post = new Post({
         title: req.body.title,
-        content: req.body.content,
+        content: sanitizedContent,
+        image: imageName,
         author: {
           authorId: req.user._id,
           firstName: req.user.firstName,
           lastName: req.user.lastName,
         },
-        isPublished: req.body.isPublished,
       });
 
       const savedPost = await post.save();
@@ -74,52 +83,12 @@ exports.getSinglePost = async (req, res, next) => {
   }
 };
 
-// exports.updatePostCommentLike = async (req, res, next) => {
-//   const post = await Post.findById(req.params.postId);
-
-//   if (req.body.updateType === "like") {
-//     try {
-//       post.numLikes = req.body.numLikes;
-
-//       const savedPost = await post.save();
-
-//       return res.json({
-//         post: savedPost,
-//         success: "Post updated successfully. ",
-//       });
-//     } catch {
-//       return res.status(503).json({ error: "Internal Error occured. " });
-//     }
-//   }
-
-//   if (req.body.updateType === "comment") {
-//     try {
-//       post.numComments = req.body.numComments;
-
-//       const savedPost = await post.save();
-
-//       return res.json({
-//         post: savedPost,
-//         success: "Post updated successfully. ",
-//       });
-//     } catch (err) {
-//       return res.status(503).json({ error: "Internal Error occured. " });
-//     }
-//   } else {
-//     return next();
-//   }
-// };
-
 exports.updatePost = [
-  body("title", "Title must be specified. ")
-    .trim()
-    .isLength({ min: 1 })
-    .escape(),
+  body("title", "Title must be specified. ").trim().isLength({ min: 1 }),
 
   body("content", "Content field cannot be empty. ")
     .trim()
-    .isLength({ min: 1 })
-    .escape(),
+    .isLength({ min: 1 }),
 
   async (req, res, next) => {
     try {
@@ -135,10 +104,7 @@ exports.updatePost = [
 
       const post = await Post.findById(req.params.postId);
       post.title = req.body.title;
-      post.content = req.body.content;
-      post.isPublished = req.body.isPublished;
-      post.numLikes = req.body.numLikes;
-      post.numComments = req.body.numComments;
+      post.content = htmlPurify.sanitize(req.body.content);
 
       const savedPost = await post.save();
 
@@ -152,25 +118,31 @@ exports.updatePost = [
   },
 ];
 
-async function deleteAllReplies(comments) {
-  for (let comment of comments) {
-    await Reply.deleteMany({ commentId: comment._id });
+async function deleteAllComments(id) {
+  const allComments = await Comment.find({ postId: id });
+  for (let comment of allComments) {
+    await Promise.all([
+      Reply.deleteMany({ commentId: comment._id }),
+      Like.deleteMany({ referenceId: comment._id }),
+      Comment.deleteOne({ _id: comment._id }),
+    ]);
   }
 }
 
-async function deleteAllComments(id) {
-  const allComments = await Comment.find({ postId: id });
-  await Promise.all([
-    Comment.deleteMany({ postId: id }),
-    deleteAllReplies(allComments),
-  ]);
+async function deletePostImage(post) {
+  if (post.image) {
+    await fs.unlink(path.join(__dirname + `/../public/images/${post.image}`));
+  }
 }
 
 exports.deletePost = async (req, res, next) => {
   try {
+    const post = await Post.findById(req.params.postId);
     await Promise.all([
       Post.findByIdAndRemove(req.params.postId),
       deleteAllComments(req.params.postId),
+      Like.deleteMany({ referenceId: req.params.postId }),
+      deletePostImage(post),
     ]);
     return res.json({ success: "Post deleted successfully. " });
   } catch (err) {

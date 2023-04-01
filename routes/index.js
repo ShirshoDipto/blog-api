@@ -6,6 +6,22 @@ const postController = require("../controllers/postController");
 const commentController = require("../controllers/commentController");
 const replyController = require("../controllers/replyController");
 const likeController = require("../controllers/likeController");
+const multer = require("multer");
+
+// const upload = multer({ dest: "public/images" });
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/images");
+  },
+  filename: function (req, file, cb) {
+    cb(null, req.body.imageName);
+  },
+});
+
+const upload = multer({ storage: storage });
+
+// const upload = multer({ storage: storage });
 
 /** Login and Signup routes.  */
 router.post("/login", userController.login);
@@ -17,6 +33,7 @@ router.get("/posts", postController.getAllPosts);
 
 router.post(
   "/posts",
+  upload.single("image"),
   passport.authenticate("jwt", { session: false }),
   postController.createPost
 );

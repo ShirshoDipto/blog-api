@@ -20,10 +20,7 @@ exports.getAllComments = async (req, res, next) => {
 };
 
 exports.createComment = [
-  body("content", "Content cannot be empty. ")
-    .trim()
-    .isLength({ min: 1 })
-    .escape(),
+  body("content", "Content cannot be empty. ").trim().isLength({ min: 1 }),
 
   async (req, res, next) => {
     try {
