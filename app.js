@@ -68,10 +68,7 @@ var usersRouter = require("./routes/users");
 var app = express();
 app.use(
   cors({
-    origin: [
-      "https://blog-app-shirsho-dipto.netlify.app",
-      "http://localhost:3000",
-    ],
+    origin: ["https://shirsho-blog.netlify.app", "http://localhost:3000"],
   })
 ); // going to change this later on.
 app.use(compression());
