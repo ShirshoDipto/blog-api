@@ -11,6 +11,8 @@ const ExtractJWT = passportJWT.ExtractJwt;
 const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
 const User = require("./models/user");
+const compression = require("compression");
+const helmet = require("helmet");
 require("dotenv").config();
 
 passport.use(
@@ -65,6 +67,8 @@ var usersRouter = require("./routes/users");
 
 var app = express();
 app.use(cors()); // going to change this later on.
+app.use(compression());
+app.use(helmet());
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
