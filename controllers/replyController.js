@@ -43,10 +43,11 @@ exports.createReply = [
       const savedReply = await reply.save();
       const comment = await Comment.findById(req.params.commentId);
       comment.numReplies += 1;
-      await comment.save();
+      const savedComment = await comment.save();
 
       return res.json({
         reply: savedReply,
+        comment: savedComment,
         success: "Reply created successfully. ",
       });
     } catch (err) {
@@ -120,10 +121,11 @@ exports.deleteReply = async (req, res, next) => {
     const deletedReply = await Reply.findByIdAndRemove(reply._id);
     const comment = await Comment.findById(req.params.commentId);
     comment.numReplies -= 1;
-    await comment.save();
+    const savedComment = await comment.save();
 
     return res.json({
       deletedReply,
+      comment: savedComment,
       success: "Reply deleted successfully. ",
     });
   } catch (err) {

@@ -70,7 +70,7 @@ app.use(
   cors({
     origin: ["https://shirsho-blog.netlify.app", "http://localhost:3000"],
   })
-); // going to change this later on.
+);
 app.use(compression());
 app.use(
   helmet({

@@ -41,10 +41,10 @@ exports.createComment = [
       const newComment = await comment.save();
       const post = await Post.findById(req.params.postId);
       post.numComments += 1;
-      await post.save();
-
+      const savedPost = await post.save();
       res.json({
         comment: newComment,
+        post: savedPost,
         success: "Comment created successfully. ",
       });
     } catch (err) {
@@ -127,10 +127,11 @@ exports.deleteComment = async (req, res, next) => {
 
     const post = await Post.findById(req.params.postId);
     post.numComments -= 1;
-    await post.save();
+    const savedPost = await post.save();
 
     return res.json({
       deletedComment: results[0],
+      post: savedPost,
       success: "Comment deleted successfully. ",
     });
   } catch (err) {
