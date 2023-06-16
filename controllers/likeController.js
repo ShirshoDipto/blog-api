@@ -139,8 +139,8 @@ exports.createPostLike = [
       const savedPost = await post.save();
 
       return res.json({
-        postLike: savedLike,
-        post: savedPost,
+        postLike: { _id: savedLike._id },
+        // post: savedPost,
         success: "Successfully created post like. ",
       });
     } catch (err) {
@@ -162,8 +162,8 @@ exports.deletePostLike = async (req, res, next) => {
     const savedPost = await post.save();
 
     res.json({
-      postLike: like,
-      post: savedPost,
+      // postLike: like,
+      // post: savedPost,
       success: "Deleted the post like successfully. ",
     });
   } catch (err) {

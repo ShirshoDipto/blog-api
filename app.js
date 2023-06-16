@@ -71,6 +71,7 @@ app.use(
     origin: ["https://shirsho-blog.netlify.app", "http://localhost:3000"],
   })
 );
+
 app.use(compression());
 app.use(
   helmet({

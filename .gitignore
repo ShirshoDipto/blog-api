@@ -1,2 +1,7 @@
 node_modules
 .env
+.vscode
+.dockerignore
+fly.toml
+Dockerfile
+databaseTests.js
