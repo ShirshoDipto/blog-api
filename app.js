@@ -68,7 +68,7 @@ var usersRouter = require("./routes/users");
 var app = express();
 app.use(
   cors({
-    origin: ["https://shirsho-blog.netlify.app", "http://localhost:3000"],
+    origin: [process.env.CLIENT_ROOT, "http://localhost:3000"],
   })
 );
 
