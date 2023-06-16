@@ -11,11 +11,11 @@ To run the front-end locally, follow the instructions given in the [Front-end Re
 ### Clone Repository
 
 ```
-git clone git@github.com:ShirshoDipto/blog-client.git
+git clone git@github.com:ShirshoDipto/blog-api.git
 ```
 
 ```
-cd blog-client
+cd blog-api
 ```
 
 ### Set up local variables
