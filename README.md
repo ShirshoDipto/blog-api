@@ -6,7 +6,7 @@ This is the api for the blog app.
 
 ## Running Locally
 
-To run the API Repository locally, follow the instructions given in the [API Repository](https://github.com/ShirshoDipto/blog-api)
+To run the front-end locally, follow the instructions given in the [Front-end Repository](https://github.com/ShirshoDipto/blog-client)
 
 ### Clone Repository
 
